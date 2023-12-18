@@ -3,7 +3,6 @@ Database models.
 """
 from django.conf import settings
 from django.db import models
-from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import (
     AbstractBaseUser,
     BaseUserManager,
@@ -17,7 +16,7 @@ class UserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
         """Create, save and return a new user."""
         if not email:
-            raise ValueError("User must have an email address.")
+            raise ValueError('User must have an email address.')
         user = self.model(email=self.normalize_email(email), **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
@@ -42,7 +41,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
 
-    USERNAME_FIELD = "email"
+    USERNAME_FIELD = 'email'
 
     objects = UserManager()
 
@@ -50,13 +49,15 @@ class User(AbstractBaseUser, PermissionsMixin):
 class Recipe(models.Model):
     """Recipe object."""
 
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE
+    )
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True)
     time_minutes = models.IntegerField()
     price = models.DecimalField(max_digits=5, decimal_places=2)
     link = models.CharField(max_length=255, blank=True)
-    tags = models.ManyToManyField("Tag")
+    tags = models.ManyToManyField('Tag')
 
     def __str__(self) -> str:
         return self.title
@@ -66,7 +67,9 @@ class Tag(models.Model):
     """Tag for filtering recipes."""
 
     name = models.CharField(max_length=255)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE
+    )
 
     def __str__(self) -> str:
         return self.name
